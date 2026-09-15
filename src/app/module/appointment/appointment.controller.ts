@@ -5,7 +5,9 @@ import httpStatus from "http-status"
 import { appointmentServices } from "./appointment.service";
 
 const bookAppointment = catchAsync(async (req: Request, res: Response) => {
-   const result = await appointmentServices.bookAppointmentService() 
+    const payload = req.body;
+    const user = req.user!
+   const result = await appointmentServices.bookAppointmentService(payload,user) 
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
@@ -15,13 +17,17 @@ const bookAppointment = catchAsync(async (req: Request, res: Response) => {
 });
 
 const bookAppointmentCallback = catchAsync(async (req: Request, res: Response) => {
-   const result = await appointmentServices.bookAppointmentCallback() 
-    sendResponse(res, {
-        statusCode: httpStatus.OK,
-        success: true,
-        message: "User profile fetched successfully",
-        data: result,
-    });
+   const {executedPaymentResult, redirectUrl} = await appointmentServices.bookAppointmentCallback(req.query) 
+   console.log(req.query,"query theke")
+    console.log({executedPaymentResult}, "callback controller");
+
+    res.redirect(redirectUrl);
+    // sendResponse(res, {
+    //     statusCode: httpStatus.OK,
+    //     success: true,
+    //     message: "User profile fetched successfully",
+    //     data: result,
+    // });
 });
 
 export const appointmentController = {
